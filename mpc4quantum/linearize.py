@@ -20,6 +20,13 @@ class WrapModel:
         self.dim_u = dim_u
         self.order = order
         self.polyu_dim = int(self.N.shape[1] / self.dim_x)
+
+        print(f"Order: {self.order}, Num Controls: {self.dim_u}")
+        expected_dim = size_of_library(self.order, self.dim_u) - 1
+        actual_dim = self.polyu_dim
+        print(f"Expected polyu_dim: {expected_dim}")
+        print(f"Actual polyu_dim from N_op shape: {actual_dim}")
+        
         if not np.isclose(size_of_library(self.order, self.dim_u) - 1, self.polyu_dim):
             raise ValueError("Dimension mismatch when wrapping a model operator.")
 

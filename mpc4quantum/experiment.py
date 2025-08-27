@@ -172,6 +172,7 @@ def _wrap_us(us):
     return us, u_dim
 
 
+    
 class QExperiment(Experiment):
     """
     The QExperiment class implements qutip's mesolve to solve quantum state preparation experiments.
@@ -396,16 +397,15 @@ class QSynthesis(Experiment):
         self.set('H', [self.H0] + [[self.H1_list[i_row], self.us[i_row]] for i_row in range(u_dim)])
         self.ts = ts
 
-        # Cases: Avoid hitting a qutip 'feature' for ts <= 2.
-        if len(self.ts) > 2:
-            self.set('t', self.ts)
-            # Unitary mode 'single' avoids the need to check if dtype is Qobj or memoryview
-            self.xs = propagator(**self._prop_args)
-        else:
-            self.xs = [None] * len(self.ts)
-            for i, t in enumerate(self.ts):
-                self.set('t', t)
-                self.xs[i] = propagator(**self._prop_args)
+        # CORRECTED LOGIC: Always use the full time list.
+        self.set('t', self.ts)
+        self.xs = propagator(**self._prop_args)
+
+        # The propagator function in QuTiP returns a list of states if the tlist has more than 2 elements,
+        # but a single state if tlist has exactly 2 elements. We need to handle this.
+        if not isinstance(self.xs, list):
+            # If it's a single state, wrap it in a list to match the expected format
+            self.xs = [self.xs]
 
         # Append the initial condition to the resulting ndarrays via multiplication, U(t, t0) @ U(t0, 0)
         if len(self.xs) > 0:
