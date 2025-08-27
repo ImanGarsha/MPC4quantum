@@ -1,6 +1,7 @@
 import numpy as np
 import qutip as qt
 import itertools as it
+import math
 
 from .linearize import create_power_list
 
@@ -29,7 +30,7 @@ def discretize_homogeneous(A_cts_list, dt, order):
 
     # Iterate over expansion order
     for an_order in range(0, order + 1):
-        prefactor = 1 / np.math.factorial(an_order) * dt ** an_order
+        prefactor = 1 / math.factorial(an_order) * dt ** an_order
         # Compute all non-commutative products in sum ** an_order
         for a_product in it.product(range(len(A_cts_list)), repeat=an_order):
             entry = id_op
@@ -41,7 +42,7 @@ def discretize_homogeneous(A_cts_list, dt, order):
             elems, counts = np.unique(a_product, return_counts=True)
             powers = np.zeros(dim_u + 1)
             powers[elems.astype(int)] = counts
-            match = np.argwhere(np.product(powers_list == np.array(powers[1:]), axis=1))
+            match = np.argwhere(np.prod(powers_list == np.array(powers[1:]), axis=1))
             if len(match) != 1:
                 raise ValueError('Error in discretization. Control powers should contribute uniquely.')
             index = match[0, 0]

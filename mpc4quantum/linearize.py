@@ -123,7 +123,7 @@ def size_of_library(order, dimension):
 def create_library_from_list(power_list):
     library = []
     for powers in np.array(power_list):
-        library.append(lambda x, ps=powers: np.product([np.zeros_like(x[i, :]) if p < 0 else np.power(x[i, :], p)
+        library.append(lambda x, ps=powers: np.prod([np.zeros_like(x[i, :]) if p < 0 else np.power(x[i, :], p)
                                                         for i, p in enumerate(ps)], axis=0))
     return library
 

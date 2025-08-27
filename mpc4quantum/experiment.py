@@ -153,8 +153,8 @@ class Rotor(CExperiment):
 
 # Utility functions for interp1d controls
 def _wrap_u(u_func, index_u):
-    def new_func(ts, args):
-        return u_func(ts)[index_u]
+    def new_func(t, args):
+        return u_func(t)[index_u]
     return new_func
 
 
@@ -400,12 +400,12 @@ class QSynthesis(Experiment):
         if len(self.ts) > 2:
             self.set('t', self.ts)
             # Unitary mode 'single' avoids the need to check if dtype is Qobj or memoryview
-            self.xs = propagator(**self._prop_args, unitary_mode='single')
+            self.xs = propagator(**self._prop_args)
         else:
             self.xs = [None] * len(self.ts)
             for i, t in enumerate(self.ts):
                 self.set('t', t)
-                self.xs[i] = propagator(**self._prop_args, unitary_mode='single')
+                self.xs[i] = propagator(**self._prop_args)
 
         # Append the initial condition to the resulting ndarrays via multiplication, U(t, t0) @ U(t0, 0)
         if len(self.xs) > 0:

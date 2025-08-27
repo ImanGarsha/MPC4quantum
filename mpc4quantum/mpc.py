@@ -9,6 +9,7 @@ import warnings
 
 import matplotlib.pyplot as plt
 import os
+import mpc4quantum as m4q
 
 
 class StepClock:
@@ -132,7 +133,11 @@ def mpc(x0, dim_u, order, X_targ, U_targ, clock, experiment, model, Q, R, Qf, sa
 
     # Initialize
     # ==========
-    lift_x0 = experiment.lift(x0)
+    # For gate synthesis, the initial state is already a 'lifted' process matrix.
+    if isinstance(experiment, m4q.QSynthesis):
+         lift_x0 = x0
+    else:
+         lift_x0 = experiment.lift(x0)
     xs = [None] * (clock.n_steps + 1)
     us = [None] * clock.n_steps
 
@@ -184,7 +189,11 @@ def mpc(x0, dim_u, order, X_targ, U_targ, clock, experiment, model, Q, R, Qf, sa
                 try:
                     u_prev = us[step - 1] if step > 1 else U_ref[:, 0].reshape(-1, 1)
                     # Lift current step to model space
-                    lift_xstep = experiment.lift(xs[step])
+                        # For gate synthesis, the state is already a 'lifted' process matrix.
+                    if isinstance(experiment, m4q.QSynthesis):
+                        lift_xstep = xs[step]
+                    else:
+                        lift_xstep = experiment.lift(xs[step])
                     # N.b. solving for x, u instead of dx, du.
                     X_opt, U_opt, obj_val, prob = quad_program(lift_xstep, X_ref, U_ref,
                                                                Q_ls, R_ls,
